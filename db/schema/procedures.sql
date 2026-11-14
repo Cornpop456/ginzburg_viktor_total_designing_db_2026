@@ -371,7 +371,7 @@ begin
             v_delivery_timestamp := null;
         end if;
 
-        -- Обычно выбираем любого курьера. Если случайно выбран уволенный,
+        -- Выбираем случайного курьера. Если случайно выбран уволенный,
         -- назначаем его только на заказ, оформленный/доставленный до увольнения.
         v_courier_id := v_courier_ids[
             1 + floor(random() * cardinality(v_courier_ids))::int
@@ -624,6 +624,7 @@ begin
 end;
 $$;
 
+
 create or replace procedure ginzburg_food.erase_test_data()
 language plpgsql
 as $$
@@ -641,5 +642,61 @@ begin
         ginzburg_food.address,
         ginzburg_food.courier,
         ginzburg_food.product_category;
+end;
+$$;
+
+create or replace procedure ginzburg_food.add_product(
+    p_name varchar(100),
+    p_product_category_id uuid,
+    p_price numeric(7, 2),
+    p_restaurant_id uuid,
+    p_photo_url text,
+    p_rating numeric(3, 2),
+    p_status ginzburg_food.product_status,
+    p_description text
+)
+language plpgsql
+as $$
+begin
+    if p_restaurant_id is null
+       or not exists (
+           select 1
+           from ginzburg_food.restaurant
+           where restaurant_id = p_restaurant_id
+       ) then
+        raise exception 'Can''t add product: restaurant with id % does not exist', p_restaurant_id
+            using errcode = 'foreign_key_violation';
+    end if;
+
+    if p_product_category_id is null
+       or not exists (
+           select 1
+           from ginzburg_food.product_category
+           where product_category_id = p_product_category_id
+       ) then
+        raise exception 'Can''t add product: product category with id % does not exist', p_product_category_id
+            using errcode = 'foreign_key_violation';
+    end if;
+
+    insert into ginzburg_food.product (
+        product_name,
+        product_category_id,
+        price,
+        restaurant_id,
+        photo_url,
+        rating,
+        status,
+        description
+    )
+    values (
+        p_name,
+        p_product_category_id,
+        p_price,
+        p_restaurant_id,
+        p_photo_url,
+        p_rating,
+        p_status,
+        p_description
+    );
 end;
 $$;

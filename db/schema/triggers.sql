@@ -58,38 +58,61 @@ execute function ginzburg_food.increase_product_quantity();
 
 -- ginzburg_food.review
 
-create function ginzburg_food.validate_review_target()
+create function ginzburg_food.rating_change()
 returns trigger
 language plpgsql
 as $$
 begin
-    if new.entity_type = 'блюдо'
-       and not exists (
-           select 1
-           from ginzburg_food.order_structure os
-           where os.order_id = new.order_id
-             and os.product_id = new.entity_id
-       ) then
-        raise exception 'Reviewed product must belong to the order';
-    elsif new.entity_type = 'ресторан'
-          and not exists (
-              select 1
-              from ginzburg_food."order" o
-              where o.order_id = new.order_id
-                and o.restaurant_id = new.entity_id
-          ) then
-        raise exception 'Reviewed restaurant must belong to the order';
-    elsif new.entity_type = 'заказ'
-          and new.entity_id != new.order_id then
-        raise exception 'Reviewed order must match order_id';
+    if tg_op in ('DELETE', 'UPDATE') then
+        if old.entity_type = 'блюдо' then
+            update ginzburg_food.product
+            set rating = (
+                select round(avg(r.rating), 2)
+                from ginzburg_food.review r
+                where r.entity_type = 'блюдо'
+                  and r.entity_id = old.entity_id
+            )
+            where product_id = old.entity_id;
+        elsif old.entity_type = 'ресторан' then
+            update ginzburg_food.restaurant
+            set rating = (
+                select round(avg(r.rating), 2)
+                from ginzburg_food.review r
+                where r.entity_type = 'ресторан'
+                  and r.entity_id = old.entity_id
+            )
+            where restaurant_id = old.entity_id;
+        end if;
     end if;
 
-    return new;
+    if tg_op in ('INSERT', 'UPDATE') then
+        if new.entity_type = 'блюдо' then
+            update ginzburg_food.product
+            set rating = (
+                select round(avg(r.rating), 2)
+                from ginzburg_food.review r
+                where r.entity_type = 'блюдо'
+                  and r.entity_id = new.entity_id
+            )
+            where product_id = new.entity_id;
+        elsif new.entity_type = 'ресторан' then
+            update ginzburg_food.restaurant
+            set rating = (
+                select round(avg(r.rating), 2)
+                from ginzburg_food.review r
+                where r.entity_type = 'ресторан'
+                  and r.entity_id = new.entity_id
+            )
+            where restaurant_id = new.entity_id;
+        end if;
+    end if;
+
+    return null;
 end;
 $$;
 
-create trigger review_target_validation
-before insert or update of entity_type, entity_id, order_id
+create trigger review_rating_change
+after insert or update or delete
 on ginzburg_food.review
 for each row
-execute function ginzburg_food.validate_review_target();
+execute function ginzburg_food.rating_change();

@@ -201,9 +201,5 @@ alter table ginzburg_food.review
         foreign key (client_id)
         references ginzburg_food.client(client_id),
 
-    add constraint review_order_client_fkey
-        foreign key (order_id, client_id)
-        references ginzburg_food."order"(order_id, client_id),
-
     add constraint review_rating_check
         check (rating between 1 and 5);

@@ -115,7 +115,7 @@ ORDER BY tbl, conname;
 ```
 
 Ожидается: не менее 15 FK, все из erd.md.
-Факт: 17 FK (15 FK из erd.md)
+Факт: 16 FK (15 FK из erd.md)
 
 ### B.7. Пароль — MD5
 
@@ -466,7 +466,7 @@ SELECT count(*) AS after FROM product;
 ```
 
 Ожидается: `after = before + 1`.
-Факт: ___
+Факт: `after = before + 1` (не получилось так вызвать процедуру, база жаловалась на подзапросы в аргументах, вызвал через do блок)
 
 ### E.2. `add_product` — падает на несуществующий ресторан
 
@@ -478,7 +478,7 @@ CALL add_product(
 ```
 
 Ожидается: ошибка с внятным сообщением.
-Факт: ___
+Факт: ошибка с внятным сообщением.
 
 ### E.3. `rating_change` — пересчитывает рейтинг
 
@@ -503,7 +503,7 @@ SELECT rating FROM product WHERE product_id = <product_id>;
 ```
 
 Ожидается: `rating` пересчитан.
-Факт: ___
+Факт: `rating` пересчитан.
 
 ### E.4. `rating_change` — удаление отзыва
 
@@ -515,7 +515,7 @@ SELECT rating FROM product WHERE product_id = <product_id>;
 ```
 
 Ожидается: если других отзывов нет — `rating IS NULL`; иначе — пересчитан.
-Факт: ___
+Факт: если других отзывов нет — `rating IS NULL`; иначе — пересчитан
 
 ### E.5. `get_statistic()`
 
