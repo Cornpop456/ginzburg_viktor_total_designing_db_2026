@@ -528,7 +528,10 @@ SELECT * FROM get_statistic();
 - По одной строке на ресторан.
 - `best_user` = `client.login` (не NULL при наличии заказов).
 
-Факт: ___
+Факт: 
+- Колонки: `restaurant_name`, `best_product_name`, `total_amount`, `avg_amount`, `best_user`.
+- По одной строке на ресторан.
+- `best_user` = `client.login` (не NULL при наличии заказов)
 
 ### E.6. `courier_salary()`
 

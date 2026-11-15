@@ -1,6 +1,6 @@
 -- ginzburg_food.payment
 
-create function ginzburg_food.check_payment_amount()
+create or replace function ginzburg_food.check_payment_amount()
 returns trigger
 language plpgsql
 as $$
@@ -20,7 +20,7 @@ begin
 end;
 $$;
 
-create trigger payment_amount_check
+create or replace trigger payment_amount_check
 before insert or update of order_id, amount
 on ginzburg_food.payment
 for each row
@@ -28,7 +28,7 @@ execute function ginzburg_food.check_payment_amount();
 
 -- ginzburg_food.order_structure
 
-create function ginzburg_food.increase_product_quantity()
+create or replace function ginzburg_food.increase_product_quantity()
 returns trigger
 language plpgsql
 as $$
@@ -50,7 +50,7 @@ begin
 end;
 $$;
 
-create trigger order_structure_merge
+create or replace trigger order_structure_merge
 before insert
 on ginzburg_food.order_structure
 for each row
@@ -58,7 +58,7 @@ execute function ginzburg_food.increase_product_quantity();
 
 -- ginzburg_food.review
 
-create function ginzburg_food.rating_change()
+create or replace function ginzburg_food.rating_change()
 returns trigger
 language plpgsql
 as $$
@@ -111,7 +111,7 @@ begin
 end;
 $$;
 
-create trigger review_rating_change
+create or replace trigger review_rating_change
 after insert or update or delete
 on ginzburg_food.review
 for each row
