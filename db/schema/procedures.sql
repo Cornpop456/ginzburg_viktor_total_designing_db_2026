@@ -645,6 +645,7 @@ begin
 end;
 $$;
 
+
 create or replace procedure ginzburg_food.add_product(
     p_name varchar(100),
     p_product_category_id uuid,
@@ -698,5 +699,76 @@ begin
         p_status,
         p_description
     );
+end;
+$$;
+
+
+create or replace procedure ginzburg_food.courier_salary()
+language plpgsql
+as $$
+declare
+    v_month_start date := date_trunc('month', current_date)::date;
+    v_next_month_start date := (date_trunc('month', current_date)
+        + interval '1 month')::date;
+    v_new_coefficient numeric(2, 1);
+    v_stats record;
+begin
+    for v_stats in
+        select
+            c.courier_id,
+            c.coefficient,
+            c.status,
+            coalesce(cp.coefficient_used, c.coefficient) as applied_coefficient,
+            count(o.order_id)::int as delivered_count,
+            coalesce(sum(o.commission), 0)::numeric as commission_sum
+        from ginzburg_food.courier c
+        left join ginzburg_food."order" o
+            on o.courier_id = c.courier_id
+           and o.status = 'доставлен'
+           and o.delivery_timestamp >= v_month_start
+           and o.delivery_timestamp < v_next_month_start
+        left join ginzburg_food.courier_pay cp
+            on cp.courier_id = c.courier_id
+           and cp.year = extract(year from current_date)::int
+           and cp.month = extract(month from current_date)::int
+        group by
+            c.courier_id,
+            c.coefficient,
+            c.status,
+            cp.coefficient_used
+    loop
+        v_new_coefficient := case
+            when v_stats.delivered_count <= 150 then 0.1
+            when v_stats.delivered_count <= 250 then 0.2
+            when v_stats.delivered_count <= 500 then 0.3
+            else 0.5
+        end;
+
+        insert into ginzburg_food.courier_pay (
+            year,
+            month,
+            courier_id,
+            amount,
+            coefficient_used
+        )
+        values (
+            extract(year from current_date)::int,
+            extract(month from current_date)::int,
+            v_stats.courier_id,
+            round(
+                v_stats.commission_sum * v_stats.applied_coefficient,
+                2
+            ),
+            v_stats.applied_coefficient
+        )
+        on conflict (year, month, courier_id) do update
+        set amount = excluded.amount,
+            coefficient_used = excluded.coefficient_used;
+
+        update ginzburg_food.courier
+        set coefficient = v_new_coefficient
+        where courier_id = v_stats.courier_id
+          and status != 'уволен';
+    end loop;
 end;
 $$;
