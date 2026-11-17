@@ -586,7 +586,7 @@ ORDER BY ordinal_position;
 ```
 
 Ожидается: `year_month` (text), `sum_no_commission`, `sum_with_commission`, `commission`, `prev_commission`, `commission_diff`, `courier_pay`, `net_profit` (numeric).
-Факт: ___
+Факт: `year_month` (text), `sum_no_commission`, `sum_with_commission`, `commission`, `prev_commission`, `commission_diff`, `courier_pay`, `net_profit` (numeric).
 
 ### F.2. Месяцы покрыты
 
@@ -595,7 +595,7 @@ SELECT * FROM how_much_money ORDER BY year_month;
 ```
 
 Ожидается: месяцы от первого доставленного заказа до последнего (не пропущено ни одного).
-Факт: ___
+Факт: месяцы от первого доставленного заказа до последнего (не пропущено ни одного).
 
 ### F.3. Месяцы без заказов присутствуют (BR-11.9)
 
@@ -605,7 +605,7 @@ WHERE sum_no_commission = 0 OR sum_no_commission IS NULL;
 ```
 
 Ожидается: если в какие-то месяцы заказов не было — они есть в результате.
-Факт: ___
+Факт: если в какие-то месяцы заказов не было — они есть в результате.
 
 ### F.4. Корректность сумм
 
@@ -628,7 +628,10 @@ LIMIT 10;
 - `commission_diff = commission - prev_commission` (NULL для первого месяца).
 - `net_profit = commission - courier_pay`.
 
-Факт: ___
+Факт:
+- `commission = sum_with_commission - sum_no_commission`.
+- `commission_diff = commission - prev_commission` (NULL для первого месяца).
+- `net_profit = commission - courier_pay`.
 
 ---
 
