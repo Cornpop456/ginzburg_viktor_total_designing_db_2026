@@ -180,10 +180,10 @@
 
 **AC:**
 
-- [ ] В `db/schema/grants.sql` — скрипт создания пользователя `inspector` с паролем `NetoSQL2025`.
-- [ ] Ему выдано `ALL PRIVILEGES` на схему `<фамилия>_food`.
-- [ ] Ему выдано `USAGE` на `information_schema` и `pg_catalog` (по умолчанию есть у всех, явно проверь, что не отозвано).
-- [ ] Ему выдано `USAGE` на `exts` (для `uuid_generate_v4`).
+- [x] В `db/schema/grants.sql` — скрипт создания пользователя `inspector` с паролем `NetoSQL2025`.
+- [x] Ему выдано `ALL PRIVILEGES` на схему `<фамилия>_food`.
+- [x] Ему выдано `USAGE` на `information_schema` и `pg_catalog` (по умолчанию есть у всех, явно проверь, что не отозвано).
+- [x] Ему выдано `USAGE` на `exts` (для `uuid_generate_v4`).
 - [ ] Под `inspector` работают: `insert_test_data(10)`, `erase_test_data()`, `add_product(...)`, `get_statistic()`, `courier_salary()`, `SELECT * FROM how_much_money`.
 - [ ] Под `inspector` работают запросы к `information_schema.tables` и `pg_catalog.pg_tables`.
 
@@ -195,11 +195,11 @@
 
 **AC:**
 
-- [ ] Файл `foodexpress_<фамилия>.backup` в формате `pg_dump -Fc`.
-- [ ] Содержит только схему `<фамилия>_food`.
-- [ ] Восстанавливается на пустую БД без ошибок.
-- [ ] После восстановления + запуска `db/schema/grants.sql` пользователь `inspector` создан и имеет права из FOOD-109.
-- [ ] После восстановления `insert_test_data(10)` и `get_statistic()` работают под `inspector`.
+- [x] Файл `foodexpress_<фамилия>.backup` в формате `pg_dump -Fc`.
+- [x] Содержит только схему `<фамилия>_food`.
+- [x] Восстанавливается на пустую БД без ошибок.
+- [x] После восстановления + запуска `db/schema/grants.sql` пользователь `inspector` создан и имеет права из FOOD-109.
+- [x] После восстановления `insert_test_data(10)` и `get_statistic()` работают под `inspector`.
 
 **Проверка:** ты разворачиваешь `.backup` на своей машине, применяешь `grants.sql`, вызываешь функции под `inspector` — всё работает.
 
