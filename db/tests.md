@@ -74,7 +74,7 @@ ORDER BY table_name;
 ```
 
 Ожидается: `address`, `client`, `client_address`, `courier`, `courier_pay`, `order`, `order_structure`, `payment`, `product`, `product_category`, `restaurant`, `review` (12 + N штук).
-Факт: 12 таблиц
+Факт: 12 таблиц + 1 view
 
 ### B.4. Все PK — `uuid`
 
