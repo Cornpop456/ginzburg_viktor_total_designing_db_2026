@@ -10,7 +10,7 @@
 
 | Параметр | Значение |
 |---|---|
-| PostgreSQL version | `SELECT version();` → 15+ |
+| PostgreSQL version | `16.15` |
 | Дата проверки | ___ |
 | Схема | `ginzburg_food` |
 | Роль-аудитор | `inspector` |
